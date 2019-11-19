@@ -1,0 +1,13 @@
+upstream container_dubbo{
+	# hash $remote_addr consistent;
+	server container_web1:20887;
+	#server container_web2:20887;
+}
+
+server {
+	listen 20887;
+	# listen 1008 udp; 通过后面添加udp，可以进行udp的转发
+	proxy_connect_timeout 10s;
+    proxy_timeout 30s;
+    proxy_pass container_dubbo;
+}

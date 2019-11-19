@@ -1,0 +1,51 @@
+*****************************************************************************
+############  1、安装docker ##############
+参考：https://docs.docker.com/install/linux/docker-ce/centos/
+
+1）升级依赖集配置仓库地址
+yum install -y yum-utils device-mapper-persistent-data lvm2
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+2）安装docker-ce（开源版本）
+yum install docker-ce docker-ce-cli containerd.io
+
+3）安装compose
+参考：https://docs.docker.com/compose/install/
+sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+4）启动docker
+systemctl enable docker.service
+systemctl start docker
+
+############ 2、安装webmin（管理centos）  ##############
+1）下载webmin
+参考：http://www.webmin.com/download.html
+wget http://prdownloads.sourceforge.net/webadmin/webmin-1.910-1.noarch.rpm
+2）安装perl依赖
+yum -y install perl perl-Net-SSLeay openssl perl-IO-Tty perl-Encode-Detect perl-Data-Dumper
+3）安装webmin
+rpm -Uvh webmin-1.910-1.noarch.rpm
+4）设置开机启动
+文件中：/etc/rc.d/rc.local
+加入：/etc/webmin/start
+5）访问webmin
+https://localhost.localdomain:10000/init/?xnavigation=1
+
+
+关闭防火墙
+systemctl stop firewalld.service
+firewall-cmd --zone=public --add-port=10000/tcp --permanent 
+firewall-cmd --reload
+
+安装mysql客户端
+mysqlclient
+yum install mysql-clent mysql-devel -y
+yum install -y mariadb.x86_64 mariadb-libs.x86_64
+
+
+配置开机启动
+/etc/rc.local
+#命令加入
+给rc.local授权
+

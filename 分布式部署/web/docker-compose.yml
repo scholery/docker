@@ -1,0 +1,56 @@
+version: "3"
+services:
+  web:
+    image: tomcat
+    volumes:
+      - ./web:/usr/local/tomcat/webapps
+      - ./logs/web1:/usr/local/tomcat/logs
+      - ./tmp:/home/test
+    environment:
+       TZ: Asia/Shanghai
+       DUBBO_IP_TO_REGISTRY: ${hostIP} 
+    ports: # 端口转发 宿主:docker
+      - "${web_port}:8080"
+      - "${dubbo_port}:20887"
+    expose:
+      - "8080"
+      - "20887"
+    extra_hosts:
+      - "container_zookeeper:172.16.0.201" 
+      - "container_nginx:172.16.0.201"       
+      - "redis:172.16.0.201"
+      - "sftp:172.16.0.202"
+      - "mysql:172.16.0.202"      
+    container_name: ${hostIP}-web
+    networks:
+      default:
+         aliases:
+          - ${hostIP}_web
+
+  api:
+    image: tomcat
+    volumes:
+      - ./api:/usr/local/tomcat/webapps
+      - ./logs/api1:/usr/local/tomcat/logs
+    environment:
+       TZ: Asia/Shanghai
+    ports: # 端口转发 宿主:docker
+      - "${api_port}:8080"       
+    expose:
+      - "8080"
+    extra_hosts:
+      - "container_zookeeper:172.16.0.201" 
+      - "container_nginx:172.16.0.201"       
+      - "redis:172.16.0.201"
+      - "sftp:172.16.0.202"
+      - "mysql:172.16.0.202"
+    container_name: ${hostIP}-api
+    networks:
+      default:
+         aliases:
+          - ${hostIP}_api
+      
+
+networks: ##定义网络组
+  default:
+   

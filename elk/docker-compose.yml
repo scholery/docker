@@ -1,0 +1,57 @@
+version: "3"
+services:      
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION}
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+      - ./elasticsearch/logs:/usr/share/elasticsearch/logs
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+    environment:
+       TZ: Asia/Shanghai
+    environment:
+       - discovery.type=single-node
+    ports:
+      - "9200:9200"
+    expose:
+      - "9200"    
+    container_name: elasticsearch
+    networks:
+      - default
+      
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELK_VERSION}
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - ./kibana/plugins:/usr/share/kibana/plugins:rw 
+    environment:
+      TZ: Asia/Shanghai
+    ports: # 端口转发 宿主:docker
+      - "5601:5601"
+    expose:
+      - "5601"    
+    container_name: kibana
+    networks:
+      - default
+          
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${ELK_VERSION}
+    volumes:
+      - /home/lfcp/nginx/logs/nginx:/usr/share/logstash/input
+      - ./logstash/plugins:/usr/share/logstash/plugins
+      - ./logstash/logs:/usr/share/logstash/logs
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./logstash/config/nginx_access.conf:/usr/share/logstash/pipeline/nginx_access.conf:ro
+      - ./logstash/data:/usr/share/logstash/data
+    ports:
+      - "5044:5044"
+    environment:
+      TZ: Asia/Shanghai
+    depends_on:
+      - elasticsearch
+    container_name: logstash
+    networks:
+      - default
+
+networks: ##定义网络组
+  default:
+   

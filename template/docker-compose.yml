@@ -1,0 +1,118 @@
+version: "3"
+services:
+  nginx: # 服务的名称
+    image: nginx
+    volumes: # 文件夹映射
+      - /opt/${customer_code}/nginx/html:/usr/share/nginx/html # 宿主:docker:只读  ,www目录
+      - /opt/${customer_code}/nginx/conf/nginx.conf:/etc/nginx/nginx.conf # nginx配置文件
+      - /opt/${customer_code}/nginx/conf/conf.d:/etc/nginx/conf.d # nginx配置文件
+      - /opt/${customer_code}/logs/nginx:/var/log/nginx  #日志
+      - /opt/docker-common/sftp:/var/sftp
+    environment:
+       TZ: Asia/Shanghai
+    ports: # 端口转发 宿主:docker
+      - "${web_port}:80"
+    expose:
+      - "80"
+      - "20887"
+    depends_on:
+      - web1
+      #- web2
+      - api1
+    container_name: ${customer_code}-nginx
+    networks:
+      default:
+         aliases:
+          - container_nginx
+
+  web1:
+    image: tomcat
+    volumes:
+      - /opt/${customer_code}/web:/usr/local/tomcat/webapps
+      - /opt/${customer_code}/logs/web1:/usr/local/tomcat/logs
+      - /opt/${customer_code}/tmp:/home/test
+    environment:
+       JAVA_OPTS: -Dsupplements.host=supplements
+       CATALINA_OPTS: -server -Xms256M -Xmx1024M -XX:MaxNewSize=256m -XX:PermSize=64M -XX:MaxPermSize=256m
+       TZ: Asia/Shanghai
+    expose:
+      - "8080"
+      - "20887"
+    external_links:
+      - mysql
+      - redis
+      - sftp
+    container_name: ${customer_code}-web1
+    networks:
+      default:
+         aliases:
+          - container_web1
+      docker-common_default:
+
+  api1:
+    image: tomcat
+    volumes:
+      - /opt/${customer_code}/api:/usr/local/tomcat/webapps
+      - /opt/${customer_code}/logs/api1:/usr/local/tomcat/logs
+    environment:
+       JAVA_OPTS: -Dsupplements.host=supplements
+       CATALINA_OPTS: -server -Xms256M -Xmx1024M -XX:MaxNewSize=256m -XX:PermSize=64M -XX:MaxPermSize=256m
+       TZ: Asia/Shanghai
+    expose:
+      - "8080"
+    depends_on:
+      - web1
+    external_links:
+      - mysql
+      - redis
+      - sftp
+    container_name: ${customer_code}-api1
+    networks:
+      default:
+         aliases:
+          - container_api1
+      docker-common_default:
+  
+  zookeeper:
+    image: zookeeper
+    environment:
+       TZ: Asia/Shanghai
+    expose:
+      - "2181"    
+    ports: # 端口转发 宿主:docker
+      - "218n:2181"
+    container_name: ${customer_code}-zookeeper
+    networks:
+      default:
+         aliases:
+          - container_zookeeper
+   
+  dubboadmin:
+    image: openjdk
+    volumes:
+      - /opt/${customer_code}/dubboadmin:/home/dubboadmin
+    depends_on:
+      - zookeeper
+    expose:
+      - 9089
+    ports: # 端口转发 宿主:docker
+     - "${dubboadmin_port}:9089"
+    environment:
+      TZ: Asia/Shanghai
+    command: [
+          'java',
+          '-Xmx200m',
+          '-jar',
+          '/home/dubboadmin/dubbo-admin-0.1.jar'
+        ]
+    container_name: ${customer_code}-dubbo
+    networks:
+      default:
+         aliases:
+          - container_dubbo
+
+networks: ##定义网络组
+  default:
+  docker-common_default:
+   external: true
+   

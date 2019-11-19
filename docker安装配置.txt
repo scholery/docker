@@ -1,0 +1,93 @@
+*****************************************************************************
+############  1、安装docker ##############
+参考：https://docs.docker.com/install/linux/docker-ce/centos/
+
+1）升级依赖集配置仓库地址
+yum install -y yum-utils device-mapper-persistent-data lvm2
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+2）安装docker-ce（开源版本）
+yum install docker-ce docker-ce-cli containerd.io
+
+compose安装
+https://docs.docker.com/compose/install/
+sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+############ 2、安装webmin（管理centos）  ##############
+1）下载webmin
+http://www.webmin.com/download.html
+wget http://prdownloads.sourceforge.net/webadmin/webmin-1.910-1.noarch.rpm
+2）安装perl依赖
+yum -y install perl perl-Net-SSLeay openssl perl-IO-Tty perl-Encode-Detect perl-Data-Dumper
+3）安装webmin
+rpm -Uvh webmin-1.910-1.noarch.rpm
+4）设置开机启动
+文件中：/etc/rc.d/rc.local
+加入：/etc/webmin/start
+5）访问webmin
+https://localhost.localdomain:10000/init/?xnavigation=1
+
+############ 3、启动Docker  ##############
+systemctl enable docker.service
+systemctl start docker
+
+############ 4、规划  ##############
+规划：
+1、公共服务
+dockerui(docker管理)
+docker run -d -p 9999:9000 -v /var/run/docker.sock:/docker.sock --name docker-web abh1nav/dockerui:latest -e="/docker.sock"
+
+mysql(docker)
+命令:docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag
+docker run --name mysql -p 3306:3306 -v /opt/docker-common/mysql/data:/var/lib/mysql -v /opt/docker-common/mysql/logs:/var/log/mysql -e MYSQL_ROOT_PASSWORD=Longer.1234 -v /etc/localtime:/etc/localtime -d mysql --lower_case_table_names=1
+
+redis(docker)
+docker run -d --name redis -p 6379:6379 redis --requirepass "longer"
+
+sftp(os服务)
+docker run --name sftp -p 4023:22 -v /opt/docker-common/sftp:/home/foo/upload -d atmoz/sftp mysftp:mysftp.1234:mysftp
+
+zentao（禅道，项目管理）
+docker run -d --name zentao --restart=always -p=10280:80 -v=/opt/docker-common/zentao:/opt/zbox idoop/zentao
+
+2、docker服务
+  原则：
+  1）一个客户一个工程（project）
+  /opt
+    -/opt/bjrdjj
+	 -/opt/bjrdjj/web  api  nginx
+	 -/opt/bjrdjj/web  api  nginx
+	 -/opt/bjrdjj/web  api  nginx 
+     -/opt/tzxbjj
+	 -/opt/bjrdjj/web  api  nginx
+	 -/opt/bjrdjj/web  api  nginx
+	 -/opt/bjrdjj/web  api  nginx 
+       ...
+  2）每个工程一个服务
+  3）每个服务3个容器（tomcat实例，用于web和api；nginx实例，用于代理前台pages）  
+*****************************************************************************
+
+*****************************************************************************
+安装swarm集群
+https://www.cnblogs.com/drawnkid/p/8487337.html
+
+
+关闭防火墙
+systemctl stop firewalld.service
+firewall-cmd --zone=public --add-port=10000/tcp --permanent 
+firewall-cmd --reload
+
+
+加入116 集群主机
+docker swarm join --token SWMTKN-1-5wr3cuqkq19qgpvn15203swx0mflarb1w19xdh58kk0lq4b4ok-dtzjgx2vvuxgy73tj29wwq4x2 192.168.1.116:2377
+
+*****************************************************************************
+
+
+
+mysqlclient
+yum install mysql-clent mysql-devel -y
+yum install -y mariadb.x86_64 mariadb-libs.x86_64
+
+

@@ -1,0 +1,12 @@
+cluster.name: es-cluster
+node.name: node
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+bootstrap.memory_lock: true
+network.host: 0.0.0.0
+http.port: 9200
+cluster.routing.allocation.disk.threshold_enabled: true
+cluster.routing.allocation.disk.watermark.low: 94%
+cluster.routing.allocation.disk.watermark.high: 96%
+cluster.routing.allocation.disk.watermark.flood_stage: 98%
+discovery.zen.minimum_master_nodes: 1

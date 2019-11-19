@@ -1,0 +1,56 @@
+version: "3"
+services:      
+  redis:
+    image: redis
+    environment:
+       TZ: Asia/Shanghai
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass redis.wzd
+    container_name: redis
+    networks:
+      default:
+         aliases:
+          - redis
+      
+  zookeeper:
+    image: zookeeper
+    environment:
+       TZ: Asia/Shanghai
+    expose:
+      - "2181"    
+    ports: # 端口转发 宿主:docker
+      - "2181:2181"
+    container_name: zookeeper
+    networks:
+      default:
+         aliases:
+          - zookeeper
+          
+  dubboadmin:
+    image: openjdk
+    volumes:
+      - ./dubboadmin:/home/dubboadmin
+    depends_on:
+      - zookeeper
+    expose:
+      - 9089
+    ports: # 端口转发 宿主:docker
+     - "${dubboadmin_port}:9089"
+    environment:
+      TZ: Asia/Shanghai
+    command: [
+          'java',
+          '-Xmx200m',
+          '-jar',
+          '/home/dubboadmin/dubbo-admin-0.1.jar'
+        ]
+    container_name: dubboadmin
+    networks:
+      default:
+         aliases:
+          - dubboadmin
+
+networks: ##定义网络组
+  default:
+   

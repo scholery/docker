@@ -1,0 +1,54 @@
+version: "3"
+services:
+  mysql:
+    image: mysql
+    volumes:
+      - /mnt/data/mysql/data:/var/lib/mysql
+      - ./logs/mysql:/var/log/mysql
+    ports:
+      - "3306:3306"
+    environment:
+       MYSQL_ROOT_PASSWORD: "WZDpro.1234"
+       lower_case_table_names: "1"
+       TZ: Asia/Shanghai
+    command: --lower_case_table_names=1
+    container_name: mysql
+    networks:
+      - default
+      
+  sftp:
+    image: atmoz/sftp
+    volumes:
+      - /mnt/data/sftp:/home
+    environment:
+       TZ: Asia/Shanghai
+    ports:
+      - "4023:22"
+    command: mysftp:pro.sftp:::mysftp
+    container_name: sftp
+    networks:
+      - default
+      
+  nginx: # 服务的名称
+    image: nginx
+    volumes: # 文件夹映射
+      - ./nginx/html:/usr/share/nginx/html # 宿主:docker:只读  ,www目录
+      - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf # nginx配置文件
+      - ./nginx/conf/conf.d:/etc/nginx/conf.d # nginx配置文件
+      - ./logs/nginx:/var/log/nginx  #日志
+      - /mnt/data/sftp:/var/sftp
+    environment:
+       TZ: Asia/Shanghai
+    ports: # 端口转发 宿主:docker
+      - "8001:8001"
+    expose:
+      - "80"
+      - "8001"
+    container_name: nginx
+    networks:
+      default:
+         aliases:
+          - nginx
+      
+networks: ##定义网络组
+    default:
