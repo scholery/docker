@@ -50,7 +50,22 @@ services:
       default:
          aliases:
           - dubboadmin
-
+      
+  canal:
+    image: canal/canal-server
+    volumes:
+      - ./canal/test/:/home/admin/canal-server/conf/test/
+      - ./canal/example/:/home/admin/canal-server/conf/example/
+      - ./canal/logs/:/home/admin/canal-server/logs/
+    ports:
+      - "11111:11111"
+    extra_hosts:
+      - "mysql:192.168.0.110"    
+    environment:
+      TZ: Asia/Shanghai
+    container_name: canal
+    networks:
+      - default
 networks: ##定义网络组
   default:
    
