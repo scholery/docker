@@ -1,0 +1,16 @@
+yum install -y yum-utils device-mapper-persistent-data lvm2
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum install docker-ce docker-ce-cli containerd.io
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+systemctl enable docker.service
+systemctl start docker
+
+systemctl stop firewalld.service
+firewall-cmd --zone=public --add-port=10000/tcp --permanent 
+firewall-cmd --reload
+
+yum install mysql-clent mysql-devel -y
+yum install -y mariadb.x86_64 mariadb-libs.x86_64

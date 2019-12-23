@@ -1,0 +1,24 @@
+#导出镜像
+docker save -o /opt/jsnd/images/openjdk.tar openjdk:latest
+docker save -o /opt/jsnd/images/nginx-1.12.tar nginx:1.12
+docker save -o /opt/jsnd/images/mysql.tar mysql:latest
+docker save -o /opt/jsnd/images/tomcat.tar tomcat:latest
+docker save -o /opt/jsnd/images/zookeeper-3.4.12.tar zookeeper::3.4.12
+docker save -o /opt/jsnd/images/redis-3.2.tar redis:3.2
+docker save -o /opt/jsnd/images/sftp.tar atmoz/sftp:latest
+
+docker load < /opt/jsnd/images/openjdk.tar
+docker load < /opt/jsnd/images/nginx-1.12.tar
+docker load < /opt/jsnd/images/mysql.tar
+docker load < /opt/jsnd/images/tomcat.tar
+docker load < /opt/jsnd/images/zookeeper-3.4.12.tar
+docker load < /opt/jsnd/images/redis-3.2.tar
+docker load < /opt/jsnd/images/sftp.tar
+
+chmod +x docker-engine-1.7.1-1.el6.x86_64.rpm
+rpm -ivh docker-engine-1.7.1-1.el6.x86_64.rpm
+
+sudo mv docker-compose-Linux-x86_64 /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+service docker start
