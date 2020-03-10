@@ -6,7 +6,7 @@ services:
        TZ: Asia/Shanghai
     ports:
       - "6379:6379"
-    command: redis-server --requirepass redis.wzd
+    command: redis-server --requirepass longer
     container_name: redis
     networks:
       default:
@@ -26,6 +26,7 @@ services:
       default:
          aliases:
           - zookeeper
+          - container_zookeeper
           
   dubboadmin:
     image: openjdk
@@ -50,22 +51,7 @@ services:
       default:
          aliases:
           - dubboadmin
-      
-  canal:
-    image: canal/canal-server
-    volumes:
-      - ./canal/test/:/home/admin/canal-server/conf/test/
-      - ./canal/example/:/home/admin/canal-server/conf/example/
-      - ./canal/logs/:/home/admin/canal-server/logs/
-    ports:
-      - "11111:11111"
-    extra_hosts:
-      - "mysql:192.168.0.110"    
-    environment:
-      TZ: Asia/Shanghai
-    container_name: canal
-    networks:
-      - default
+
 networks: ##定义网络组
   default:
    

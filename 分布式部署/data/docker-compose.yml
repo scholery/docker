@@ -1,6 +1,5 @@
 version: "3"
 services:
-  mysql:
     image: mysql
     volumes:
       - /mnt/data/mysql/data:/var/lib/mysql
@@ -24,7 +23,7 @@ services:
        TZ: Asia/Shanghai
     ports:
       - "4023:22"
-    command: mysftp:pro.sftp:::mysftp
+    command: mysftp:mysftp.1234:::mysftp
     container_name: sftp
     networks:
       - default
