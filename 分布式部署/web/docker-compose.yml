@@ -9,6 +9,7 @@ services:
     environment:
        TZ: Asia/Shanghai
        DUBBO_IP_TO_REGISTRY: ${hostIP} 
+       node.name: ${hostIP}-web
     ports: # 端口转发 宿主:docker
       - "${web_port}:8080"
       - "${dubbo_port}:20887"      
@@ -34,6 +35,7 @@ services:
       - ./logs/api1:/usr/local/tomcat/logs
     environment:
        TZ: Asia/Shanghai
+       node.name: ${hostIP}-api
     ports: # 端口转发 宿主:docker
       - "${api_port}:8080"       
     expose:
