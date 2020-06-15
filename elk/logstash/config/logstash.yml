@@ -1,3 +1,0 @@
-path.data: /usr/share/logstash/data
-path.logs: /usr/share/logstash/logs
-pipeline.batch.size: 200
