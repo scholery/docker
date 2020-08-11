@@ -23,6 +23,10 @@ services:
       - "sftp:28.0.4.14"
       - "mysql:28.0.4.13"      
     container_name: ${hostIP}-web
+    logging:
+        driver: "json-file"
+        options:
+            max-size: "50m"
     networks:
       default:
          aliases:
@@ -49,6 +53,10 @@ services:
       - "sftp:28.0.4.14"
       - "mysql:28.0.4.13"   
     container_name: ${hostIP}-api
+    logging:
+        driver: "json-file"
+        options:
+            max-size: "50m"
     networks:
       default:
          aliases:
